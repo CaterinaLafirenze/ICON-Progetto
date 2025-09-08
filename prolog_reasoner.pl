@@ -1,5 +1,3 @@
-% prolog_reasoner.pl
-
 % Predicati per le feature normalizzate e gli indici di colore
 u(Stella, Val) :- magnitude(Stella, u, Val).
 g(Stella, Val) :- magnitude(Stella, g, Val).
@@ -32,5 +30,15 @@ risolvi_ambiguita(Stella, 'GALAXY', 'I suoi indici g-r e r-i sono alti, tipico d
     IndiceGR > 0.7,
     IndiceRI > 0.3, !.
 
+
+risolvi_ambiguita(Stella, 'RED_DWARF', 'Il suo indice r-i e'' molto alto, tipico di una Nana Rossa.') :-
+    gr(Stella, IndiceGR),
+    ri(Stella, IndiceRI),
+    IndiceGR < 0.2,
+    IndiceRI > 0.8, !.
+
+risolvi_ambiguita(Stella, 'WHITE_DWARF', 'Il suo indice g-r e'' negativo, tipico di una Nana Bianca.') :-
+    gr(Stella, IndiceGR),
+    IndiceGR < 0, !.
 % Predicato di fallback se nessuna regola si applica
 risolvi_ambiguita(_, 'Indefinito', 'Nessuna regola si applica per questo oggetto.').

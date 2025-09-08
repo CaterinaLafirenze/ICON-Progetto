@@ -20,7 +20,7 @@ def load_and_preprocess_data(file_path):
     df.dropna(inplace=True)
 
     # Mappa le classi di testo in numeri interi
-    class_mapping = {'STAR': 0, 'GALAXY': 1, 'QSO': 2}
+    class_mapping = {'STAR': 0, 'GALAXY': 1, 'QSO': 2, 'RED_DWARF':3, 'WHITE_DWARF':4}
     df['class'] = df['class'].map(class_mapping)
 
     # Seleziona le feature (X) e la variabile target (y)
