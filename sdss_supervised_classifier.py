@@ -6,9 +6,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 def load_and_preprocess_data(file_path):
-    """
-    Carica, pulisce e prepara i dati per l'apprendimento automatico.
-    """
+
+    #Carica e prepara i dati per l'apprendimento automatico
+
     try:
         df = pd.read_csv(file_path)
     except FileNotFoundError:
@@ -20,7 +20,7 @@ def load_and_preprocess_data(file_path):
     df.dropna(inplace=True)
 
     # Mappa le classi di testo in numeri interi
-    class_mapping = {'STAR': 0, 'GALAXY': 1, 'QSO': 2, 'RED_DWARF':3, 'WHITE_DWARF':4}
+    class_mapping = {'QSO': 0, 'STAR': 1, 'GALAXY': 2, 'RED_DWARF':3, 'WHITE_DWARF':4}
     df['class'] = df['class'].map(class_mapping)
 
     # Seleziona le feature (X) e la variabile target (y)
@@ -35,9 +35,9 @@ def load_and_preprocess_data(file_path):
 
 
 def train_and_evaluate_model(X, y):
-    """
-    Addestra e valuta un modello di Random Forest e identifica i casi ambigui.
-    """
+
+    # Addestra e valuta un modello di Random Forest e identifica i casi ambigui
+
     print("Addestramento del modello di base (Random Forest)...")
     model = RandomForestClassifier(n_estimators=100, random_state=42)
 

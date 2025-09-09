@@ -6,9 +6,9 @@ from sklearn.preprocessing import MinMaxScaler
 from pyswip import Prolog
 
 
-# --- Sezione 1: Funzioni di Preprocessing e Machine Learning ---
+# Funzioni di preprocessing e machine learning
 def load_and_preprocess_data(file_path):
-    """Carica, pulisce e prepara i dati per la classificazione."""
+# Carica e prepara i dati per la classificazione
     try:
         df = pd.read_csv(file_path)
     except FileNotFoundError:
@@ -19,7 +19,7 @@ def load_and_preprocess_data(file_path):
     df.drop(['obj_ID', 'alpha', 'delta', 'spec_obj_ID', 'MJD', 'fiber_ID'], axis=1, inplace=True)
     df.dropna(inplace=True)
 
-    class_mapping = {'STAR': 0, 'GALAXY': 1, 'QSO': 2}
+    class_mapping = {'QSO': 0,'STAR': 1, 'GALAXY': 2,'RED_DWARF': 3, 'WHITE_DWARF': 4}
     df['class'] = df['class'].map(class_mapping)
 
     X = df.drop('class', axis=1)
@@ -31,9 +31,9 @@ def load_and_preprocess_data(file_path):
     return pd.DataFrame(X_scaled, columns=X.columns), pd.Series(y, index=y.index), class_mapping
 
 
-# --- Sezione 2: Funzione per il Motore di Ragionamento Prolog ---
+# Funzione per il motore di ragionamento Prolog
 def resolve_ambiguities_with_prolog(ambiguous_cases, class_mapping, ambiguous_true_labels):
-    """Risolve i casi ambigui usando un motore di ragionamento Prolog."""
+# Risolve i casi ambigui usando un motore di ragionamento Prolog
     prolog = Prolog()
     prolog.consult("prolog_reasoner.pl")
 
@@ -81,15 +81,15 @@ def resolve_ambiguities_with_prolog(ambiguous_cases, class_mapping, ambiguous_tr
     return resolved_count, correctly_resolved_count, detailed_results
 
 
-# --- Sezione 3: Funzione per la Valutazione del Sistema Ibrido ---
-def evaluate_hybrid_system(X, y, class_mapping, n_splits=5):
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+# Funzione per la valutazione del sistema
+def evaluate_system(X, y, class_mapping, n_splits=10):
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=33)
 
-    total_hybrid_accuracies = []
+    total_accuracies = []
     total_prolog_accuracies = []
 
     print("----------------------------------------------------")
-    print("Valutazione del Sistema Ibrido con K-Fold Cross-Validation:")
+    print("Valutazione del Sistema con K-Fold Cross-Validation:")
     print("----------------------------------------------------")
 
     for fold, (train_index, test_index) in enumerate(kf.split(X)):
@@ -115,34 +115,34 @@ def evaluate_hybrid_system(X, y, class_mapping, n_splits=5):
 
         ml_predictions = model.predict(X_test)
         ml_predictions[ambiguous_indices] = [class_mapping[res['prolog_class']] for res in detailed_results]
-        hybrid_accuracy = np.mean(ml_predictions == y_test)
-        total_hybrid_accuracies.append(hybrid_accuracy)
+        accuracy = np.mean(ml_predictions == y_test)
+        total_accuracies.append(accuracy)
 
         print(f"Fold {fold + 1}:")
         print(f"  - Casi ambigui passati a Prolog: {len(ambiguous_cases)}")
         print(f"  - Accuratezza di Prolog sui casi ambigui: {prolog_accuracy:.4f}")
-        print(f"  - Accuratezza ibrida totale: {hybrid_accuracy:.4f}\n")
+        print(f"  - Accuratezza totale: {accuracy:.4f}\n")
 
     print("----------------------------------------------------")
-    print("Valutazione Media Finale del Sistema Ibrido:")
+    print("Valutazione Media Finale del Sistema:")
     print(f"Accuratezza media di Prolog sui casi ambigui: {np.mean(total_prolog_accuracies):.4f}")
     print(f"Deviazione Standard di Prolog sui casi ambigui: {np.std(total_prolog_accuracies):.4f}")
-    print(f"Accuratezza media complessiva del sistema ibrido: {np.mean(total_hybrid_accuracies):.4f}")
-    print(f"Deviazione Standard complessiva del sistema ibrido: {np.std(total_hybrid_accuracies):.4f}")
+    print(f"Accuratezza media complessiva del sistema: {np.mean(total_accuracies):.4f}")
+    print(f"Deviazione Standard complessiva del sistema: {np.std(total_accuracies):.4f}")
     print("----------------------------------------------------")
 
     return detailed_results, ambiguous_cases, ambiguous_true_labels, model
 
 
-# --- Sezione Principale ---
+#
 if __name__ == '__main__':
     X, y, class_mapping = load_and_preprocess_data('star_galaxy_quasar_sdss.csv')
 
-    # Valutazione del sistema ibrido con K-fold cross-validation
-    detailed_results, ambiguous_cases, ambiguous_true_labels, model = evaluate_hybrid_system(X, y, class_mapping)
+    # Valutazione del sistema con K-fold cross-validation
+    detailed_results, ambiguous_cases, ambiguous_true_labels, model = evaluate_system(X, y, class_mapping)
 
-    # --- Sezione di Esempi Dettagliati (dopo l'esecuzione del K-fold) ---
-    print("\n\n--- Esempi di Classificazione Ibrida in Dettaglio (dall'ultimo fold) ---")
+    # Sezione di esempi dettagliati (dopo l'esecuzione del K-fold)
+    print("\n\n--- Esempi di classificazione in dettaglio (dall'ultimo fold) ---")
 
     reverse_class_mapping = {v: k for k, v in class_mapping.items()}
     ml_predictions = model.predict(ambiguous_cases)

@@ -5,14 +5,13 @@ r(Stella, Val) :- magnitude(Stella, r, Val).
 i(Stella, I) :- magnitude(Stella, i, I).
 z(Stella, Z) :- magnitude(Stella, z, Z).
 
-% Regole per gli indici di colore (corrette)
+% Regole per gli indici di colore
 ug(Stella, Indice) :- u(Stella, U), g(Stella, G), Indice is U - G.
 gr(Stella, Indice) :- g(Stella, G), r(Stella, R), Indice is G - R.
 ri(Stella, Indice) :- r(Stella, R), i(Stella, I), Indice is R - I.
 iz(Stella, Indice) :- i(Stella, I), z(Stella, Z), Indice is I - Z.
 
-% Predicato di ragionamento principale con spiegazione (versioni uniche e corrette)
-% NOTA: L'ordine delle regole è importante.
+% Predicato di ragionamento principale con spiegazione
 
 risolvi_ambiguita(Stella, 'QSO', 'Il suo indice u-g e'' basso, tipico di un Quasar.') :-
     ug(Stella, IndiceUG), gr(Stella, IndiceGR),
@@ -40,5 +39,6 @@ risolvi_ambiguita(Stella, 'RED_DWARF', 'Il suo indice r-i e'' molto alto, tipico
 risolvi_ambiguita(Stella, 'WHITE_DWARF', 'Il suo indice g-r e'' negativo, tipico di una Nana Bianca.') :-
     gr(Stella, IndiceGR),
     IndiceGR < 0, !.
-% Predicato di fallback se nessuna regola si applica
+
+% Predicato di fallback, soluzione alternativa nei casi non soddisfatti
 risolvi_ambiguita(_, 'Indefinito', 'Nessuna regola si applica per questo oggetto.').
