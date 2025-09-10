@@ -63,7 +63,7 @@ def train_and_evaluate_model(X, y):
     print("----------------------------------------------------")
 
     # Ri-addestra il modello sul dataset completo per l'analisi successiva
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=33)
     model.fit(X_train, y_train)
 
     # Ottiene le probabilità di confidenza per le previsioni

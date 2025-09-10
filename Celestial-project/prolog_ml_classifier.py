@@ -15,7 +15,7 @@ def load_and_preprocess_data(file_path):
         print(f"Errore: Il file '{file_path}' non è stato trovato.")
         exit()
 
-    df = df.head(5000)
+    df = df.head(1000)
     df.drop(['obj_ID', 'alpha', 'delta', 'spec_obj_ID', 'MJD', 'fiber_ID'], axis=1, inplace=True)
     df.dropna(inplace=True)
 
@@ -96,7 +96,7 @@ def evaluate_system(X, y, class_mapping, n_splits=10):
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model = RandomForestClassifier(n_estimators=100, random_state=33)
         model.fit(X_train, y_train)
 
         probabilities = model.predict_proba(X_test)

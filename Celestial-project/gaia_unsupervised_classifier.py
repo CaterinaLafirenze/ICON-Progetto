@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
     # Funz ioni di preprocessing e analisi di Clustering
@@ -58,8 +60,7 @@ def load_and_preprocess_data_gaia(file_path):
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
 
-    return pd.DataFrame(X_scaled, columns=X.columns), y, class_mapping
-
+    return pd.DataFrame(X_scaled, columns=X.columns), y, class_mapping, df
 
 def evaluate_clustering(X, y, n_clusters=10):
     # Esegue il clustering K-Means e valuta la purezza dei cluster
@@ -79,21 +80,43 @@ def evaluate_clustering(X, y, n_clusters=10):
     total_samples = len(y)
     purity_score = purity / total_samples
 
-    return purity_score
-
+    return purity_score, cluster_labels
 
 if __name__ == '__main__':
     file_name = 'gaia_data.csv'
 
-    X, y, class_mapping = load_and_preprocess_data_gaia(file_name)
-
+    X, y, class_mapping, df = load_and_preprocess_data_gaia(file_name)
     print("----------------------------------------------------")
     print("Analisi di Clustering Non Supervisionato (K-Means)")
     print("----------------------------------------------------\n")
 
     # IL clustering cerca i 10 cluster
-    kmeans_purity = evaluate_clustering(X, y, n_clusters=10)
-
+    kmeans_purity, cluster_labels = evaluate_clustering(X, y, n_clusters=10)
     print(f"Purezza del Clustering: {kmeans_purity:.4f}\n")
     print("----------------------------------------------------")
     print("L'analisi di clustering è completata.")
+
+    # Mappa le etichette numeriche dei cluster ai nomi originali delle classi per il grafico
+    reverse_class_mapping = {v: k for k, v in class_mapping.items()}
+    df['class_name'] = df['class'].map(reverse_class_mapping)
+
+    # Aggiungi le etichette dei cluster al DataFrame
+    df['cluster_label'] = cluster_labels
+
+    plt.style.use('seaborn-v0_8-whitegrid')  # Stile per i grafici
+
+    # GRAFICO 1: Visualizzazione dei Cluster trovati da K-Means
+    plt.figure(figsize=(12, 6))
+    sns.scatterplot(
+        x='bp_rp',
+        y='g_bp',
+        hue='cluster_label',
+        data=df,
+        palette=sns.color_palette("hsv", n_colors=10),
+        s=40
+    )
+    plt.title('Cluster K-Means (10 Cluster)')
+    plt.xlabel('bp-rp (Indice di colore)')
+    plt.ylabel('g-bp (Indice di colore)')
+    plt.show()
+
