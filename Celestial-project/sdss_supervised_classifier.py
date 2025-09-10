@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
@@ -23,6 +25,16 @@ def load_and_preprocess_data(file_path):
     class_mapping = {'QSO': 0, 'STAR': 1, 'GALAXY': 2, 'RED_DWARF':3, 'WHITE_DWARF':4}
     df['class'] = df['class'].map(class_mapping)
 
+    # Visualizza la distribuzione delle classi nel dataset
+    plt.figure(figsize=(10, 6))
+    sns.countplot(data=df, x='class', palette='viridis', hue='class', legend=False)
+    plt.title('Distribuzione delle classi nel Dataset')
+    plt.xlabel('Classi (0=QSO, 1=STAR, 2=GALAXY, 3=RED_DWARF, 4=WHITE_DWARF)')
+    plt.ylabel('Numero di Oggetti')
+    plt.xticks(ticks=[0, 1, 2, 3, 4], labels=['QSO', 'STAR', 'GALAXY', 'RED_DWARF', 'WHITE_DWARF'])
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
     # Seleziona le feature (X) e la variabile target (y)
     X = df.drop('class', axis=1)
     y = df['class']
@@ -39,10 +51,10 @@ def train_and_evaluate_model(X, y):
     # Addestra e valuta un modello di Random Forest e identifica i casi ambigui
 
     print("Addestramento del modello di base (Random Forest)...")
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model = RandomForestClassifier(n_estimators=100, random_state=33)
 
     # Esegue la cross-validation e calcola accuratezza media e deviazione standard
-    cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    cv_scores = cross_val_score(model, X, y, cv=10, scoring='accuracy')
 
     print("\n----------------------------------------------------")
     print("Valutazione del Modello di Base (Cross-Validation):")
