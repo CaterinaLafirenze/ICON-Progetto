@@ -1,8 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from gaia_unsupervised_classifier import load_and_preprocess_data_gaia, evaluate_clustering
+
 
 
 def evaluate_random_forest(X, y):
@@ -23,6 +26,23 @@ def evaluate_random_forest(X, y):
     return np.mean(accuracies), np.std(accuracies)
 
 
+def plot_comparison(rf_accuracy, kmeans_purity):
+    # Crea un grafico a barre per confrontare l'accuratezza e la purezza
+    labels = ['Random Forest\n(Supervisionato)', 'K-Means\n(Non Supervisionato)']
+    scores = [rf_accuracy, kmeans_purity]
+
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=labels, y=scores, palette='viridis', hue=labels, legend=False)
+    plt.title('Confronto tra Metodo Supervisionato e Non Supervisionato')
+    plt.ylabel('Punteggio')
+    plt.ylim(0, 1.0)  # Assicura che l'asse Y parta da 0 e arrivi a 1.0
+
+    # Aggiunge il valore numerico sopra ogni barra
+    for i, v in enumerate(scores):
+        plt.text(i, v + 0.02, f"{v:.4f}", ha='center', fontweight='bold')
+
+    plt.show()
+
 
 if __name__ == '__main__':
     file_name = 'gaia_data.csv'
@@ -41,7 +61,7 @@ if __name__ == '__main__':
 
     # Valutazione del metodo Non Supervisionato (K-Means Clustering)
     # riesegue calcolo di purezza per il confronto
-    kmeans_purity, _ = evaluate_clustering(X, y, n_clusters=2)
+    kmeans_purity, _ = evaluate_clustering(X, y, n_clusters=10)
     print(f"Valutazione del Metodo Non Supervisionato (K-Means):")
     print(f"  - Purezza del Clustering: {kmeans_purity:.4f}\n")
 
@@ -57,3 +77,5 @@ if __name__ == '__main__':
     else:
         print(
             "Il modello non supervisionato ha ottenuto un risultato sorprendentemente simile o migliore. Questo indica che la struttura dei dati è molto ben definita.")
+
+    plot_comparison(rf_accuracy_mean, kmeans_purity)
