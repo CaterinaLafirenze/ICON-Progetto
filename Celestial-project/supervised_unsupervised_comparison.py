@@ -27,7 +27,7 @@ def evaluate_random_forest(X, y):
 if __name__ == '__main__':
     file_name = 'gaia_data.csv'
 
-    X, y, class_mapping = load_and_preprocess_data_gaia(file_name)
+    X, y, class_mapping, df = load_and_preprocess_data_gaia(file_name)
 
     print("----------------------------------------------------")
     print("Confronto tra Apprendimento Supervisionato e Non Supervisionato")
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # Valutazione del metodo Non Supervisionato (K-Means Clustering)
     # riesegue calcolo di purezza per il confronto
-    kmeans_purity = evaluate_clustering(X, y, n_clusters=2)
+    kmeans_purity, _ = evaluate_clustering(X, y, n_clusters=2)
     print(f"Valutazione del Metodo Non Supervisionato (K-Means):")
     print(f"  - Purezza del Clustering: {kmeans_purity:.4f}\n")
 
